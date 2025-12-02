@@ -2,15 +2,16 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { setField, resetField } from "../services/formSlice";
+import { setField, resetField, initialState } from "../services/formSlice";
 import { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import Link from 'next/link';
 
 export default function FormPage() {
     const state = useSelector((state: any) => state.reduxForm);
     const dispatch = useDispatch();
-    const router= useRouter();
+    const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
 
     // ensure component only renders after client mount
@@ -30,7 +31,9 @@ export default function FormPage() {
     const formik = useFormik({
         initialValues: state,
         validationSchema,
-        enableReinitialize: true,
+        // enableReinitialize: true,
+        validateOnBlur: true,
+        validateOnChange: true,
         onSubmit: (values) => {
             console.log("Redux Form Submitted:----------", values);
             dispatch(resetField());
@@ -45,7 +48,7 @@ export default function FormPage() {
 
             if (checked) {
                 updated.push(value);
-            } 
+            }
             // else {
             //     updated = updated.filter((v) => v !== value);
             // }
@@ -83,12 +86,7 @@ export default function FormPage() {
                     {/* Name */}
                     <div className="flex flex-col">
                         <label className="mb-1 text-gray-700 dark:text-gray-200 font-semibold">Name *</label>
-                        <input
-                            name="name"
-                            value={formik.values.name}
-                            onChange={handleChange}
-                            className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-200"
-                        />
+                        <input name="name" value={formik.values.name} onChange={handleChange} className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-200" />
                         <p className="text-red-500 text-sm mt-1">
                             {formik.touched.name && renderError(formik.errors.name)}
                         </p>
@@ -97,13 +95,7 @@ export default function FormPage() {
                     {/* Email */}
                     <div className="flex flex-col">
                         <label className="mb-1 text-gray-700 dark:text-gray-200 font-semibold">Email *</label>
-                        <input
-                            name="email"
-                            type="email"
-                            value={formik.values.email}
-                            onChange={handleChange}
-                            className="dark:text-gray-200 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                        <input name="email" type="email" value={formik.values.email} onChange={handleChange} className="dark:text-gray-200 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         <p className="text-red-500 text-sm mt-1">
                             {formik.touched.email && renderError(formik.errors.email)}
                         </p>
@@ -113,13 +105,7 @@ export default function FormPage() {
                     {/* Password */}
                     <div className="flex flex-col">
                         <label className="mb-1 text-gray-700 dark:text-gray-200 font-semibold ">Password *</label>
-                        <input
-                            name="password"
-                            type="password"
-                            value={formik.values.password}
-                            onChange={handleChange}
-                            className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                        />
+                        <input name="password" type="password" value={formik.values.password} onChange={handleChange} className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
                         <p className="text-red-500 text-sm mt-1">
                             {formik.touched.password && renderError(formik.errors.password)}
                         </p>
@@ -131,23 +117,11 @@ export default function FormPage() {
                         <label className="mb-1 text-gray-700 dark:text-gray-200 font-semibold">Gender *</label>
                         <div className="flex gap-4 items-center">
                             <label className="flex items-center gap-1 dark:text-gray-400">
-                                <input
-                                    type="radio"
-                                    name="gender"
-                                    value="male"
-                                    checked={formik.values.gender === "male"}
-                                    onChange={handleChange}
-                                />
+                                <input type="radio" name="gender" value="male" checked={formik.values.gender === "male"} onChange={handleChange} />
                                 Male
                             </label>
                             <label className="flex items-center gap-1 dark:text-gray-400">
-                                <input
-                                    type="radio"
-                                    name="gender"
-                                    value="female"
-                                    checked={formik.values.gender === "female"}
-                                    onChange={handleChange}
-                                />
+                                <input type="radio" name="gender" value="female" checked={formik.values.gender === "female"} onChange={handleChange} />
                                 Female
                             </label>
                         </div>
@@ -166,13 +140,7 @@ export default function FormPage() {
                         <div className="flex flex-row gap-4">
                             {coursesList.map((course) => (
                                 <label key={course.value} className="flex items-center gap-2 dark:text-gray-400">
-                                    <input
-                                        type="checkbox"
-                                        name="courses"
-                                        value={course.value}
-                                        checked={formik.values.courses.includes(course.value)}
-                                        onChange={handleChange}
-                                    />
+                                    <input type="checkbox" name="courses" value={course.value} checked={formik.values.courses.includes(course.value)} onChange={handleChange} />
                                     {course.label}
                                 </label>
                             ))}
@@ -187,11 +155,7 @@ export default function FormPage() {
                     {/* Country */}
                     <div className="flex flex-col">
                         <label className="mb-1 text-gray-700 dark:text-gray-200 font-semibold">Country</label>
-                        <select
-                            name="country"
-                            value={formik.values.country}
-                            onChange={handleChange}
-                            className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-400">
+                        <select name="country" value={formik.values.country} onChange={handleChange} className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-400">
                             <option value="">Select Country</option>
                             <option value="india">India</option>
                             <option value="usa">USA</option>
@@ -201,14 +165,22 @@ export default function FormPage() {
 
                     {/* Submit */}
                     <div className="flex flex-row justify-center gap-5 mt-2">
-                    <button type="submit" className="bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={(!formik.isValid) && (!formik.dirty)}>
-                        Submit
-                    </button>
-                     <button onClick={()=> router.push('/')}
-                     className="bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed" >
-                        back
-                    </button>
+                        <button type="submit" className="bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={(!formik.isValid) || (!formik.dirty)}>
+                            Submit
+                        </button>
+                        <button onClick={() => {
+                            formik.resetForm({
+                                values: initialState,
+                                touched: {},
+                                errors: {},
+                            });
+                            dispatch({ type: 'RESET' })
+                        }}
+                            className="bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-800 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed hover:cursor-pointer" >
+                            Reset
+                        </button>
                     </div>
+                    <Link href={'/'} className="text-blue-500">Back to home?</Link>
                 </form>
             </div>
         </div>
